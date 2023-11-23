@@ -28,7 +28,7 @@ class Warehouse:
         #self._api = AlphaVantage(api_key)
         self._data_dir = DATA_DIR
 
-    def extend(self, table: str, data: pd.DataFrame):
+    def extend_table(self, table: str, data: pd.DataFrame):
         raise Exception()
     
     def list_keys(self, table: str) -> list:

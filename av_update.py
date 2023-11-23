@@ -26,16 +26,16 @@ def update_price_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) 
     table = 'price_data'
     data = api.get_daily_adjusted(tick)
     data = av.decode_price_data(data).set_index('timestamp')
-    warehouse.extend(table, data)
+    warehouse.extend_table(table, data)
 
 def update_earnings_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
     table = 'earnings_data'
     data = api.get_earnings(tick)
     data = av.decode_earnings_data(data).set_index('timestamp')
-    warehouse.extend(table, data)
+    warehouse.extend_table(table, data)
 
 def update_company_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
     table = 'company_data'
     data = api.get_company_overview(tick)
     data = av.decode_company_data(data)
-    warehouse.extend(table, data)
+    warehouse.extend_table(table, data)
