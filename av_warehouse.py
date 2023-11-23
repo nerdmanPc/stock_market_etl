@@ -1,12 +1,13 @@
-from av_api import *
-from av_load import load_data
-from os.path import exists
+
+#from av_load import load_data
+#from os.path import exists
 import pandas as pd
-import json
-from io import StringIO
+#import json
+#from io import StringIO
 
 DATA_DIR = './data/alpha_vantage'
 
+'''
 def store_data(data: pd.DataFrame, table: str, tick: str):
     path = f'{DATA_DIR}/{table}/{tick}.ftr'
     return data.to_feather(path)
@@ -21,13 +22,28 @@ def get_tick_list(list_path):
         for line in file.readlines():
             ticks.append(line.rstrip())
         return ticks
-
+'''
 class Warehouse:
-
-    def __init__(self, api_key=None) -> None:
-        self._api = AlphaVantage(api_key)
+    def __init__(self) -> None:
+        #self._api = AlphaVantage(api_key)
         self._data_dir = DATA_DIR
 
+    def extend(self, table: str, data: pd.DataFrame):
+        raise Exception()
+    
+    def list_keys(self, table: str) -> list:
+        raise Exception()
+    
+    def extend_keys(self, table: str, keys: list):
+        raise Exception()
+    
+    def remove_keys(self, table: str, keys: list):
+        raise Exception()
+    
+    def clear_table(self, table: str):
+        raise Exception()
+    
+    '''
     def init_price_data(self, tick):
         table = 'price_data'
         if not table_exists(table, tick):
@@ -107,7 +123,7 @@ class Warehouse:
             new_data = decode_earnings_data(new_data)
             new_data.set_index('timestamp', inplace=True)
 
-    def update_overview_data(self, tick):
+    def update_company_data(self, tick):
         table = 'company_data'
         #overview_path = f'{DATA_FOLDER}/company_data/{tick}.json'
         if table_exists(table, tick):
@@ -139,23 +155,4 @@ class Warehouse:
             data = fetch_data(query)
             store_bytes(data, cashflow_path)
 
-
-if __name__ == '__main__':
-    warehouse = Warehouse()
-    ticks = get_tick_list(f'{DATA_DIR}/tick_list.txt')
-
-    for tick in ticks:
-        warehouse.init_price_data(tick)
-        warehouse.init_overview_data(tick)
-        warehouse.init_income_statement(tick)
-        warehouse.init_balance_sheet(tick)
-        warehouse.init_cashflow_data(tick)
-        warehouse.init_earnings_data(tick)
-
-        #warehouse.update_overview_data(tick)
-        #warehouse.update_income_statement(tick)
-        #warehouse.update_balance_sheet(tick)
-        #warehouse.update_cashflow_data(tick)
-        warehouse.update_earnings_data(tick)
-        warehouse.update_price_data(tick)
-    
+    '''
