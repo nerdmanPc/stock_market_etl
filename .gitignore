@@ -1,4 +1,5 @@
 api-key.txt
 exploration_2.ipynb
 data/
+.vscode/
 __pycache__/
