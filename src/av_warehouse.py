@@ -1,11 +1,14 @@
 
 #from av_load import load_data
 #from os.path import exists
+
 import pandas as pd
+import sqlite3 as sql3
+
 #import json
 #from io import StringIO
 
-DATA_DIR = './data/alpha_vantage'
+DATA_DIR = './data'
 
 '''
 def store_data(data: pd.DataFrame, table: str, tick: str):
@@ -24,15 +27,24 @@ def get_tick_list(list_path):
         return ticks
 '''
 class Warehouse:
-    def __init__(self) -> None:
-        #self._api = AlphaVantage(api_key)
-        self._data_dir = DATA_DIR
+    def __init__(self, db_conn=None) -> None:
+        #self._data_dir = DATA_DIR
+        self.db_conn = db_conn or sql3.connect(f'{DATA_DIR}/warehouse.db')
 
-    def extend_table(self, table: str, data: pd.DataFrame):
-        raise Exception()
+    def extend_table(self, table: str, data: list):
+        columns = self.db_conn.execute(f"PRAGMA table_info({table})").fetchall()
+        values_tuple = ','.join(['?'] * len(columns))
+        self.db_conn.executemany(f'INSERT OR IGNORE INTO {table} VALUES ({values_tuple})', data)
+        self.db_conn.commit()
     
     def list_keys(self, table: str) -> list:
-        raise Exception()
+        key_cols = '*'
+        cursor = self.db_conn.execute(f'SELECT {key_cols} FROM {table}')
+        return cursor.fetchall()
+    
+    def list_rows(self, table: str) -> list:
+        cursor = self.db_conn.execute(f'SELECT * FROM {table}')
+        return cursor.fetchall()
     
     def extend_keys(self, table: str, keys: list):
         raise Exception()
@@ -42,6 +54,9 @@ class Warehouse:
     
     def clear_table(self, table: str):
         raise Exception()
+    
+    def close(self):
+        self.db_conn.close()
     
     '''
     def init_price_data(self, tick):
