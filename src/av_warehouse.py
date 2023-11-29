@@ -32,13 +32,20 @@ class Warehouse:
         self.db_conn = db_conn or sql3.connect(f'{DATA_DIR}/warehouse.db')
 
     def extend_table(self, table: str, data: list):
-        columns = self.db_conn.execute(f"PRAGMA table_info({table})").fetchall()
-        values_tuple = ','.join(['?'] * len(columns))
-        self.db_conn.executemany(f'INSERT OR IGNORE INTO {table} VALUES ({values_tuple})', data)
+        n_columns = len(self.db_conn.execute(f"PRAGMA table_info({table})").fetchall())
+        placeholders = ','.join(['?'] * n_columns)
+        self.db_conn.executemany(f'INSERT OR IGNORE INTO {table} VALUES ({placeholders})', data)
         self.db_conn.commit()
     
     def list_keys(self, table: str) -> list:
-        key_cols = '*'
+        columns = self.db_conn.execute(f"SELECT name FROM PRAGMA table_info({table}) WHERE pk != 0 ORDER BY pk").fetchall()
+
+        is_primary_key = lambda x: x[-1] != 0
+        get_primary_key = lambda x: x[-1]
+        get_name = lambda x: x[1]
+        
+        key_cols = map(get_name, sorted(filter(is_primary_key, columns), get_primary_key))
+        key_cols = ','.join(key_cols)
         cursor = self.db_conn.execute(f'SELECT {key_cols} FROM {table}')
         return cursor.fetchall()
     
@@ -90,7 +97,7 @@ class Warehouse:
             data = fetch_data(query)
             data = decode_fundamentals(data)
             store_data(data, table, tick)
-
+values_tuple = ','.join(['?'] * len(columns))
     def init_cashflow_data(self, tick): 
         table = 'cashflow_data'
         if not table_exists(table, tick):
