@@ -38,13 +38,13 @@ class Warehouse:
         self.db_conn.commit()
     
     def list_keys(self, table: str) -> list:
-        columns = self.db_conn.execute(f"SELECT name FROM PRAGMA table_info({table}) WHERE pk != 0 ORDER BY pk").fetchall()
+        columns = self.db_conn.execute(f"PRAGMA table_info({table})").fetchall()
 
         is_primary_key = lambda x: x[-1] != 0
         get_primary_key = lambda x: x[-1]
         get_name = lambda x: x[1]
         
-        key_cols = map(get_name, sorted(filter(is_primary_key, columns), get_primary_key))
+        key_cols = map(get_name, sorted(filter(is_primary_key, columns), key=get_primary_key))
         key_cols = ','.join(key_cols)
         cursor = self.db_conn.execute(f'SELECT {key_cols} FROM {table}')
         return cursor.fetchall()

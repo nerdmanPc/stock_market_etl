@@ -114,7 +114,7 @@ def fetch_data(url: str) -> str:
     return data
 
 def check_api_error(data: str, url: str):
-    try: # Happy path is when there is no 'Error Message' is thrown
+    try: # Happy path is when there is no 'Error Message'
         err_msg = json.loads(data)['Error Message']
         raise Exception(f'API error!\nMessage: {err_msg}\nURL: {url}')
     except:
