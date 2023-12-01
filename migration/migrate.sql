@@ -10,7 +10,7 @@ create table if not exists price_data (
     dividend_amount,
     split_coefficient,
     primary key (tick, timestamp),
-    foreign key (tick) references (company_data)
+    foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
 );
@@ -23,7 +23,7 @@ create table if not exists earnings_data (
     surprise,
     surprisePercentage,
     primary key (tick, timestamp),
-    foreign key (tick) references (company_data)
+    foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
 );

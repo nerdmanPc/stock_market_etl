@@ -8,7 +8,8 @@ import sqlite3 as sql3
 #import json
 #from io import StringIO
 
-DATA_DIR = './data'
+DATA_DIR = 'data'
+
 
 '''
 def store_data(data: pd.DataFrame, table: str, tick: str):
@@ -26,19 +27,25 @@ def get_tick_list(list_path):
             ticks.append(line.rstrip())
         return ticks
 '''
+
+def connect(db_path):
+    return sql3.connect(db_path)
 class Warehouse:
-    def __init__(self, db_conn=None) -> None:
+    def __init__(self, db_conn) -> None:
         #self._data_dir = DATA_DIR
-        self.db_conn = db_conn or sql3.connect(f'{DATA_DIR}/warehouse.db')
+        self.db_conn = db_conn
 
     def extend_table(self, table: str, data: list):
-        n_columns = len(self.db_conn.execute(f"PRAGMA table_info({table})").fetchall())
+        table_info_query = f"PRAGMA table_info({table})"
+        n_columns = len(self.db_conn.execute(table_info_query).fetchall())
         placeholders = ','.join(['?'] * n_columns)
-        self.db_conn.executemany(f'INSERT OR IGNORE INTO {table} VALUES ({placeholders})', data)
+        extend_query = f'INSERT OR IGNORE INTO {table} VALUES ({placeholders})'
+        self.db_conn.executemany(extend_query, data)
         self.db_conn.commit()
     
     def list_keys(self, table: str) -> list:
-        columns = self.db_conn.execute(f"PRAGMA table_info({table})").fetchall()
+        table_info_query = f"PRAGMA table_info({table})"
+        columns = self.db_conn.execute(table_info_query).fetchall()
 
         is_primary_key = lambda x: x[-1] != 0
         get_primary_key = lambda x: x[-1]
@@ -46,11 +53,13 @@ class Warehouse:
         
         key_cols = map(get_name, sorted(filter(is_primary_key, columns), key=get_primary_key))
         key_cols = ','.join(key_cols)
-        cursor = self.db_conn.execute(f'SELECT {key_cols} FROM {table}')
+        list_keys_query = f'SELECT {key_cols} FROM {table}'
+        cursor = self.db_conn.execute(list_keys_query)
         return cursor.fetchall()
     
     def list_rows(self, table: str) -> list:
-        cursor = self.db_conn.execute(f'SELECT * FROM {table}')
+        list_rows_query = f'SELECT * FROM {table}'
+        cursor = self.db_conn.execute(list_rows_query)
         return cursor.fetchall()
     
     def extend_keys(self, table: str, keys: list):

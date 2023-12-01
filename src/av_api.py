@@ -1,8 +1,9 @@
 
 import requests as http
 from time import sleep
-from io import StringIO
-import pandas as pd
+#from io import StringIO
+#import pandas as pd
+import csv
 import json
 
 AV_ENDPOINT = 'https://alphavantage.co/query'
@@ -24,17 +25,17 @@ class AlphaVantage:
             raise Exception(f'Invalid data type: {data_type}')
         return f'{AV_ENDPOINT}?{params}'
     
-    def get_intraday(self, symbol, interval_mins, output_size='compact', data_type='csv'):
+    def get_intraday(self, symbol, interval_mins, output_size='full', data_type='csv'):
         query = self.intraday_query_query(symbol, interval_mins, output_size, data_type)
         return fetch_data(query)
 
-    def intraday_query(self, symbol, interval_mins, output_size='compact', data_type='csv'):
+    def intraday_query(self, symbol, interval_mins, output_size='full', data_type='csv'):
         params = f'function=TIME_SERIES_INTRADAY&apikey={self._api_key}&symbol={symbol}'
         if interval_mins in [1, 5, 30, 60, '1', '5', '30', '60']:
             params += f'&interval={interval_mins}min'
         else:
             raise Exception(f'Invalid interval: {interval_mins}')
-        if output_size == 'compact' or output_size == 'full':
+        if output_size == 'full' or output_size == 'full':
             params += f'&outputsize={output_size}'
         else:
             raise Exception(f'Invalid output size: {output_size}')
@@ -44,13 +45,13 @@ class AlphaVantage:
             raise Exception(f'Invalid data type: {data_type}')
         return f'{AV_ENDPOINT}?{params}'
     
-    def get_daily_adjusted(self, symbol, output_size='compact', data_type='csv'):
+    def get_daily_adjusted(self, symbol, output_size='full', data_type='csv'):
         query = self.daily_adjusted_query(symbol, output_size, data_type)
         return fetch_data(query)
 
-    def daily_adjusted_query(self, symbol, output_size='compact', data_type='csv'):
+    def daily_adjusted_query(self, symbol, output_size='full', data_type='csv'):
         params = f'function=TIME_SERIES_DAILY_ADJUSTED&apikey={self._api_key}&symbol={symbol}'
-        if output_size == 'compact' or output_size == 'full':
+        if output_size == 'full' or output_size == 'full':
             params += f'&outputsize={output_size}'
         else:
             raise Exception(f'Invalid output size: {output_size}')
@@ -119,26 +120,32 @@ def check_api_error(data: str, url: str):
         raise Exception(f'API error!\nMessage: {err_msg}\nURL: {url}')
     except:
         pass
+    try:
+        info_msg = json.loads(data)['Information']
+        raise Exception(f'API error!\nMessage: {info_msg}\nURL: {url}')
+    except:
+        pass
 
-def decode_price_data(data: str) -> pd.DataFrame:
-    return pd.read_csv(StringIO(data))
+def decode_price_data(data: str) -> list[tuple]:
+    rows = csv.reader(data.splitlines())
+    return [tuple(row) for row in rows]
 
-def decode_earnings_data(data: str) -> pd.DataFrame:
+def decode_earnings_data(data: str):
     data = json.loads(data)
     if 'quarterlyEarnings' in data:
         data = data['quarterlyEarnings']
     else:
         data = data['annualEarnings']
-    return pd.DataFrame(data)
+    return [tuple(row.values()) for row in data]
 
-def decode_fundamentals(data: str) -> pd.DataFrame:
+def decode_fundamentals(data: str) -> list[tuple]:
     data = json.loads(data)
     if 'quarterlyEarnings' in data:
         data = data['quarterlyReports']
     else:
         data = data['annualReports']
-    return pd.DataFrame(data)
+    return data
 
-def decode_company_data(data: str) -> pd.DataFrame:
+def decode_company_data(data: str) -> list[tuple]:
     data = json.loads(data)
-    return pd.DataFrame([data])
+    return [data]

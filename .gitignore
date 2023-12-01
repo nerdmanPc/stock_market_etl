@@ -1,5 +1,7 @@
 api-key.txt
-exploration_2.ipynb
 data/
 .vscode/
 __pycache__/
+
+exploration_2.ipynb
+av_load.py
