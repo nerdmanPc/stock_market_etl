@@ -1,5 +1,5 @@
-import av_api as av
-import av_warehouse as wh
+import src.av_api as av
+import src.av_warehouse as wh
 
 def run():
     api = av.AlphaVantage()
@@ -24,22 +24,22 @@ def run():
 
 def update_price_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
     table = 'price_data'
-    data = api.get_daily_adjusted(tick)
-    data = av.decode_price_data(data) #TODO
+    data = api.get_weekly_adjusted(tick)
+    data = av.decode_price_data(data) 
     data = [(tick,) + row for row in data]
     warehouse.extend_table(table, data)
 
 def update_earnings_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
     table = 'earnings_data'
     data = api.get_earnings(tick)
-    data = av.decode_earnings_data(data) #TODO
+    data = av.decode_earnings_data(data)
     data = [(tick,) + row for row in data]
     warehouse.extend_table(table, data)
 
 def update_company_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
     table = 'company_data'
     data = api.get_company_overview(tick)
-    data = av.decode_company_data(data) #TODO
+    data = av.decode_company_data(data) 
     data = [(tick,) + row for row in data]
     warehouse.extend_table(table, data)
 

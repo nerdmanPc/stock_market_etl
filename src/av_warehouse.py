@@ -30,6 +30,7 @@ def get_tick_list(list_path):
 
 def connect(db_path):
     return sql3.connect(db_path)
+
 class Warehouse:
     def __init__(self, db_conn) -> None:
         #self._data_dir = DATA_DIR

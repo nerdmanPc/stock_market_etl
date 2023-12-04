@@ -1,30 +1,12 @@
-import unittest as test
-import src.av_warehouse as wh
-import sqlite3 as sql3
+from unittest import TestCase, main
 
-class TestSetup:
-    def __init__(self) -> None:
+from setup import WarehouseSetup
 
-        self.table = 'test_table'
-        self.empty_table = 'empty_table'
-
-        self.old_data = [('AAPL', 1), ('NVDA', 2), ('IBM', 3)]
-        self.new_data = [('TSLA', 4), ('GOOG', 5), ('AMD', 6)]
-
-        test_db = sql3.connect(':memory:')
-        test_db.execute(f'CREATE TABLE {self.table} (key PRIMARY KEY, value)')
-        test_db.execute(f'CREATE TABLE {self.empty_table} (key PRIMARY KEY, value)')
-
-        test_db.executemany(f'INSERT INTO {self.table} VALUES (?, ?)', self.old_data)
-        test_db.commit()
-
-        self.warehouse = self.warehouse = wh.Warehouse(test_db)
-
-class ExtendTable(test.TestCase):
+class ExtendTable(TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.setup = TestSetup()
+        self.setup = WarehouseSetup()
 
     def test_zero(self):
         setup = self.setup
@@ -65,11 +47,11 @@ class ExtendTable(test.TestCase):
         super().tearDown()
         self.setup.warehouse.close()
 
-class Listkeys(test.TestCase):
+class Listkeys(TestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.setup = TestSetup()
+        self.setup = WarehouseSetup()
 
     def test_empty_table(self):
         setup = self.setup
@@ -169,4 +151,4 @@ class ClearTable(test.TestCase):
         self._warehouse.close()
 '''
 if __name__ == '__main__':
-    test.main()
+    main()
