@@ -1,5 +1,5 @@
-import src.av_api as av
-import src.av_warehouse as wh
+import av_api as av
+import av_warehouse as wh
 
 def run():
     api = av.AlphaVantage()
