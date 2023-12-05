@@ -198,4 +198,4 @@ def decode_fundamentals(data: str) -> list[tuple]:
 
 def decode_company_data(data: str) -> list[tuple]:
     data = json.loads(data)
-    return [data]
+    return [tuple(data.values())]
