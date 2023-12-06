@@ -38,8 +38,8 @@ class Warehouse:
 
     def extend_table(self, table: str, data: list):
         table_info_query = f"PRAGMA table_info({table})"
-        n_columns = len(self.db_conn.execute(table_info_query).fetchall())
-        placeholders = ','.join(['?'] * n_columns)
+        columns = self.db_conn.execute(table_info_query).fetchall()
+        placeholders = ','.join(['?'] * len(columns))
         extend_query = f'INSERT OR IGNORE INTO {table} VALUES ({placeholders})'
         self.db_conn.executemany(extend_query, data)
         self.db_conn.commit()

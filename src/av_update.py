@@ -1,3 +1,8 @@
+from os import getcwd
+CWD = getcwd()
+import sys
+PATH = sys.path
+
 import src.av_api as av
 import src.av_warehouse as wh
 
@@ -40,7 +45,7 @@ def update_company_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str
     table = 'company_data'
     data = api.get_company_overview(tick)
     data = av.decode_company_data(data) 
-    data = [(tick,) + row for row in data]
+    #data = [(tick,) + row for row in data]
     warehouse.extend_table(table, data)
 
 if __name__ == '__main__':

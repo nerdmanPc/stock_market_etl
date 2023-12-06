@@ -101,7 +101,7 @@ class EmptyWareHouse(TestCase):
             "913119000",
             "2023-12-09",
             "2023-11-09"
-        )], self.warehouse.list_rows('earnings_data'))
+        )], self.warehouse.list_rows('company_data'))
 
 if __name__ == '__main__':
     main()
