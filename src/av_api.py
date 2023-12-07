@@ -189,12 +189,13 @@ def decode_earnings_data(data: str):
     return [tuple(row.values()) for row in data]
 
 def decode_fundamentals(data: str) -> list[tuple]:
+    dbg_data = '\n'.join(data.split())
     data = json.loads(data)
-    if 'quarterlyEarnings' in data:
+    if 'quarterlyReports' in data:
         data = data['quarterlyReports']
     else:
         data = data['annualReports']
-    return data
+    return [tuple(row.values()) for row in data]
 
 def decode_company_data(data: str) -> list[tuple]:
     data = json.loads(data)

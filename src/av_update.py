@@ -1,8 +1,3 @@
-from os import getcwd
-CWD = getcwd()
-import sys
-PATH = sys.path
-
 import src.av_api as av
 import src.av_warehouse as wh
 
@@ -38,6 +33,27 @@ def update_earnings_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: st
     table = 'earnings_data'
     data = api.get_earnings(tick)
     data = av.decode_earnings_data(data)
+    data = [(tick,) + row for row in data]
+    warehouse.extend_table(table, data)
+
+def update_cashflow_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
+    table = 'cashflow_data'
+    data = api.get_cash_flow(tick)
+    data = av.decode_fundamentals(data)
+    data = [(tick,) + row for row in data]
+    warehouse.extend_table(table, data)
+
+def update_income_statement(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
+    table = 'income_statement'
+    data = api.get_income_statement(tick)
+    data = av.decode_fundamentals(data)
+    data = [(tick,) + row for row in data]
+    warehouse.extend_table(table, data)
+
+def update_balance_sheet(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str) -> None:
+    table = 'balance_sheet'
+    data = api.get_balance_sheet(tick)
+    data = av.decode_fundamentals(data)
     data = [(tick,) + row for row in data]
     warehouse.extend_table(table, data)
 

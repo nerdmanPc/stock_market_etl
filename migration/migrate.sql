@@ -13,19 +13,138 @@ create table if not exists price_data (
         on delete cascade 
         on update no action
 );
+
 create table if not exists earnings_data (
     tick,
-    timestamp,
-    reported_date,
+    fiscal_Date_Ending,
+    reported_Date,
     reported_EPS,
     estimated_EPS,
     surprise,
-    surprise_percentage,
-    primary key (tick, timestamp),
+    surprise_Percentage,
+    primary key (tick, fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
 );
+
+create table if not exists cashflow_data (
+    tick,
+    fiscal_Date_Ending,
+    reported_Currency,
+    operating_Cashflow,
+    payments_For_Operating_Activities,
+    proceeds_From_Operating_Activities,
+    change_In_Operating_Liabilities,
+    change_In_Operating_Assets,
+    depreciation_Depletion_And_Amortization,
+    capital_Expenditures,
+    change_In_Receivables,
+    change_In_Inventory,
+    profit_Loss,
+    cashflow_From_Investment,
+    cashflow_From_Financing,
+    proceeds_From_Repayments_Of_Short_Term_Debt,
+    payments_For_Repurchase_Of_Common_Stock,
+    payments_For_Repurchase_Of_Equity,
+    payments_For_Repurchase_Of_Preferred_Stock,
+    dividend_Payout,
+    dividend_Payout_Common_Stock,
+    dividend_Payout_Preferred_Stock,
+    proceeds_From_Issuance_Of_Common_Stock,
+    proceeds_From_Issuance_Of_Long_Term_Debt_And_Capital_Securities_Net,
+    proceeds_From_Issuance_Of_Preferred_Stock,
+    proceeds_From_Repurchase_Of_Equity,
+    proceeds_From_Sale_Of_Treasury_Stock,
+    change_In_Cash_And_Cash_Equivalents,
+    change_In_Exchange_Rate,
+    net_Income,
+    primary key (tick, fiscal_Date_Ending),
+    foreign key (tick) references company_data (tick)
+        on delete cascade 
+        on update no action
+);
+
+create table if not exists income_statement (
+    tick,
+    fiscal_Date_Ending,
+    reported_Currency,
+    gross_Profit,
+    total_Revenue,
+    cost_Of_Revenue,
+    costof_Goods_And_Services_Sold,
+    operating_Income,
+    selling_General_And_Administrative,
+    research_And_Development,
+    operating_Expenses,
+    investment_Income_Net,
+    net_Interest_Income,
+    interest_Income,
+    interest_Expense,
+    non_Interest_Income,
+    other_Non_Operating_Income,
+    depreciation,
+    depreciation_And_Amortization,
+    income_Before_Tax,
+    income_Tax_Expense,
+    interest_And_Debt_Expense,
+    net_Income_From_Continuing_Operations,
+    comprehensive_Income_Net_Of_Tax,
+    ebit,
+    ebitda,
+    net_Income,
+    primary key (tick, fiscal_Date_Ending),
+    foreign key (tick) references company_data (tick)
+        on delete cascade 
+        on update no action
+);
+
+create table if not exists balance_sheet(
+    tick,
+    fiscal_Date_Ending,
+    reported_Currency,
+    total_Assets,
+    total_Current_Assets,
+    cash_And_Cash_Equivalents_At_Carrying_Value,
+    cash_And_Short_Term_Investments,
+    inventory,
+    current_Net_Receivables,
+    total_Non_Current_Assets,
+    property_Plant_Equipment,
+    accumulated_Depreciation_Amortization_PPE,
+    intangible_Assets,
+    intangible_Assets_Excluding_Goodwill,
+    goodwill,
+    investments,
+    long_Term_Investments,
+    short_Term_Investments,
+    other_Current_Assets,
+    other_Non_Current_Assets,
+    total_Liabilities,
+    total_Current_Liabilities,
+    current_Accounts_Payable,
+    deferred_Revenue,
+    current_Debt,
+    short_Term_Debt,
+    total_Non_Current_Liabilities,
+    capital_Lease_Obligations,
+    long_Term_Debt,
+    current_Long_Term_Debt,
+    long_Term_Debt_Noncurrent,
+    short_Long_Term_Debt_Total,
+    other_Current_Liabilities,
+    other_Non_Current_Liabilities,
+    total_Shareholder_Equity,
+    treasury_Stock,
+    retained_Earnings,
+    common_Stock,
+    common_Stock_Shares_Outstanding,
+    primary key (tick, fiscal_Date_Ending),
+    foreign key (tick) references company_data (tick)
+        on delete cascade 
+        on update no action
+);
+
 create table if not exists company_data (
     tick primary key,
     Asset_Type,
