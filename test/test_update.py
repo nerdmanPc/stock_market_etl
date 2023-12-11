@@ -3,7 +3,7 @@ import sqlite3 as sql3
 
 from src.av_update import *
 from src.av_warehouse import Warehouse
-from src.av_api import AlphaVantage
+from src.av_api import AlphaVantage, decode_price_data, decode_earnings_data, decode_fundamentals, decode_company_data
 
 def mock_api(test_case: TestCase) -> AlphaVantage:
     price_response = open('test/samples/WEEKLY_ADJUSTED_IBM.csv').read()
@@ -107,6 +107,72 @@ class EmptyWareHouse(TestCase):
             "145.97", "136.88", "913119000", "2023-12-09", "2023-11-09"
         )
         self.assertEqual([first_row], self.warehouse.list_rows('company_data'))
+
+class NonEmptyWarehouse(TestCase):
+    def setUp(self) -> None:
+        self.api = mock_api(self)
+
+        migration = open('migration/migrate.sql').read()
+        memory_db = sql3.connect(':memory:')
+        memory_db.executescript(migration)
+        self.warehouse = Warehouse(memory_db)
+
+        prices_response = self.api.get_weekly_adjusted('IBM')
+        self.new_prices = [('IBM',) + row for row in decode_price_data(prices_response)]
+        old_prices = self.new_prices[:-12]
+        self.warehouse.extend_table('price_data', old_prices)
+
+        earnings_response = self.api.get_earnings('IBM')
+        self.new_earnings = [('IBM',) + row for row in decode_earnings_data(earnings_response)]
+        old_earnings = self.new_earnings[:-4]
+        self.warehouse.extend_table('earnings_data', old_earnings)
+
+        cash_flow_response = self.api.get_cash_flow('IBM')
+        self.new_cash_flow = [('IBM',) + row for row in decode_fundamentals(cash_flow_response)]
+        old_cash_flow = self.new_cash_flow[:-4]
+        self.warehouse.extend_table('cashflow_data', old_cash_flow)
+
+        income_statement_response = self.api.get_income_statement('IBM')
+        self.new_income_statement = [('IBM',) + row for row in decode_fundamentals(income_statement_response)]
+        old_income_statement = self.new_income_statement[:-4]
+        self.warehouse.extend_table('income_statement', old_income_statement)
+
+        balance_sheet_response = self.api.get_balance_sheet('IBM')
+        self.new_balance_sheet = [('IBM',) + row for row in decode_fundamentals(balance_sheet_response)]
+        old_balance_sheet = self.new_balance_sheet[:-4]
+        self.warehouse.extend_table('balance_sheet', old_balance_sheet)
+
+        overview_response = self.api.get_company_overview('IBM')
+        self.new_overview = decode_company_data(overview_response)
+        row_width = len(self.new_overview[0])
+        old_overview = [('IBM',) + ('DID_NOT_UPDATE',) * (row_width - 1)]
+        self.warehouse.update_table('company_data', old_overview)
+
+    def test_should_update_prices(self):
+        update_price_data(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_prices, self.warehouse.list_rows('price_data'))
+
+    def test_should_update_earnings(self):
+        update_earnings_data(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_earnings, self.warehouse.list_rows('earnings_data'))
+
+    def test_should_update_cashflow(self):
+        update_cashflow_data(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_cash_flow, self.warehouse.list_rows('cashflow_data'))
+    
+    def test_should_update_income_statement(self):
+        update_income_statement(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_income_statement, self.warehouse.list_rows('income_statement'))
+    
+    def test_should_update_balance_sheet(self):
+        update_balance_sheet(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_balance_sheet, self.warehouse.list_rows('balance_sheet'))
+
+    def test_should_update_companies(self):
+        update_company_data(self.api, self.warehouse, 'IBM')
+        self.assertEqual(self.new_overview, self.warehouse.list_rows('company_data'))
+
+
 
 if __name__ == '__main__':
     main()

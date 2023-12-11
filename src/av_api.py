@@ -14,11 +14,11 @@ class AlphaVantage:
         self._api_key = api_key or get_api_key()
         self._fetch_data = request_callback or fetch_data
 
-    def search_symbol(self, keywords, data_type='json'):
+    def search_symbol(self, keywords, data_type='json') -> str:
         query = self.symbol_search_query(keywords, data_type)
         return self._fetch_data(query)
 
-    def symbol_search_query(self, keywords, data_type='json'):
+    def symbol_search_query(self, keywords, data_type='json') -> str:
         arguments = {
             'function': 'SYMBOL_SEARCH',
             'apikey': self._api_key,
@@ -29,11 +29,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_intraday(self, symbol, interval_mins, output_size='full', data_type='csv'):
+    def get_intraday(self, symbol, interval_mins, output_size='full', data_type='csv') -> str:
         query = self.intraday_query_query(symbol, interval_mins, output_size, data_type)
         return self._fetch_data(query)
 
-    def intraday_query(self, symbol, interval_mins, output_size='full', data_type='csv'):
+    def intraday_query(self, symbol, interval_mins, output_size='full', data_type='csv') -> str:
         arguments = {
             'function': 'TIME_SERIES_INTRADAY',
             'apikey': self._api_key,
@@ -46,11 +46,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_daily_adjusted(self, symbol, output_size='full', data_type='csv'):
+    def get_daily_adjusted(self, symbol, output_size='full', data_type='csv') -> str:
         query = self.daily_adjusted_query(symbol, output_size, data_type)
         return self._fetch_data(query)
 
-    def daily_adjusted_query(self, symbol, output_size='full', data_type='csv'):
+    def daily_adjusted_query(self, symbol, output_size='full', data_type='csv') -> str:
         arguments = {
             'function': 'TIME_SERIES_DAILY_ADJUSTED',
             'apikey': self._api_key,
@@ -62,11 +62,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_weekly_adjusted(self, symbol, data_type='csv'):
+    def get_weekly_adjusted(self, symbol, data_type='csv') -> str:
         query = self.weekly_adjusted_query(symbol, data_type)
         return self._fetch_data(query)
 
-    def weekly_adjusted_query(self, symbol, data_type='csv'):
+    def weekly_adjusted_query(self, symbol, data_type='csv') -> str:
         arguments = {
             'function': 'TIME_SERIES_WEEKLY_ADJUSTED',
             'apikey': self._api_key,
@@ -77,43 +77,43 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_company_overview(self, symbol):
+    def get_company_overview(self, symbol) -> str:
         query = self.company_overview_query(symbol)
         return self._fetch_data(query)
 
-    def company_overview_query(self, symbol):
+    def company_overview_query(self, symbol) -> str:
         params = f'function=OVERVIEW&apikey={self._api_key}&symbol={symbol}'
         return f'{AV_ENDPOINT}?{params}'
     
-    def get_income_statement(self, symbol):
+    def get_income_statement(self, symbol) -> str:
         query = self.income_statement_query(symbol)
         return self._fetch_data(query)
 
-    def income_statement_query(self, symbol):
+    def income_statement_query(self, symbol) -> str:
         params = f'function=INCOME_STATEMENT&apikey={self._api_key}&symbol={symbol}'
         return f'{AV_ENDPOINT}?{params}'
 
-    def get_balance_sheet(self, symbol):
+    def get_balance_sheet(self, symbol) -> str:
         query = self.balance_sheet_query(symbol)
         return self._fetch_data(query)
 
-    def balance_sheet_query(self, symbol):
+    def balance_sheet_query(self, symbol) -> str:
         params = f'function=BALANCE_SHEET&apikey={self._api_key}&symbol={symbol}'
         return f'{AV_ENDPOINT}?{params}'
     
-    def get_cash_flow(self, symbol):
+    def get_cash_flow(self, symbol) -> str:
         query = self.cash_flow_query(symbol)
         return self._fetch_data(query)
 
-    def cash_flow_query(self, symbol):
+    def cash_flow_query(self, symbol) -> str:
         params = f'function=CASH_FLOW&apikey={self._api_key}&symbol={symbol}'
         return f'{AV_ENDPOINT}?{params}'
     
-    def get_earnings(self, symbol):
+    def get_earnings(self, symbol) -> str:
         query = self.earnings_query(symbol)
         return self._fetch_data(query)
 
-    def earnings_query(self, symbol):
+    def earnings_query(self, symbol) -> str:
         params = f'function=EARNINGS&apikey={self._api_key}&symbol={symbol}'
         return f'{AV_ENDPOINT}?{params}'
     

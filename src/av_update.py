@@ -62,7 +62,7 @@ def update_company_data(api: av.AlphaVantage, warehouse: wh.Warehouse, tick: str
     data = api.get_company_overview(tick)
     data = av.decode_company_data(data) 
     #data = [(tick,) + row for row in data]
-    warehouse.extend_table(table, data)
+    warehouse.update_table(table, data)
 
 if __name__ == '__main__':
     run()

@@ -15,6 +15,15 @@ class Warehouse:
         extend_query = f'INSERT OR IGNORE INTO {table} VALUES ({placeholders})'
         self.db_conn.executemany(extend_query, data)
         self.db_conn.commit()
+
+    def update_table(self, table: str, data: list):
+        table_info_query = f"PRAGMA table_info({table})"
+        columns = self.db_conn.execute(table_info_query).fetchall()
+        #dbg = { col[1]: value for col, value in zip(columns, data[0]) }
+        placeholders = ','.join(['?'] * len(columns))
+        update_query = f'INSERT OR REPLACE INTO {table} VALUES ({placeholders})'
+        self.db_conn.executemany(update_query, data)
+        self.db_conn.commit()
     
     def list_keys(self, table: str) -> list:
         table_info_query = f"PRAGMA table_info({table})"
