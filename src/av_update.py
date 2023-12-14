@@ -1,30 +1,19 @@
 import src.av_api as av
 import src.av_warehouse as wh
 
-WAREHOUSE_DIRECTORY = 'data/'
+WAREHOUSE_PATH = 'data/warehouse.db'
 
 def run():
     api = av.AlphaVantage()
-    warehouse = wh.Warehouse(wh.connect(f'{WAREHOUSE_DIRECTORY}warehouse.db'))
-    ticks = warehouse.list_keys('companies_data')
+    warehouse = wh.Warehouse(wh.sqlite_connection(WAREHOUSE_PATH))
+    ticks = [key[0] for key in warehouse.list_keys('companies_data')]
 
-    for (tick,) in ticks:
-        update_company_data(api, warehouse, tick)
-
-    for (tick,) in ticks:
-        update_earnings_data(api, warehouse, tick)
-
-    for (tick,) in ticks:
-        update_cashflow_data(api, warehouse, tick)
-
-    for (tick,) in ticks:
-        update_balance_sheet(api, warehouse, tick)
-    
-    for (tick,) in ticks:
-        update_income_statement(api, warehouse, tick)
-
-    for (tick,) in ticks:
-        update_price_data(api, warehouse, tick)
+    update_company_data(api, warehouse, ticks)
+    update_earnings_data(api, warehouse, ticks)
+    update_cashflow_data(api, warehouse, ticks)
+    update_balance_sheet(api, warehouse, ticks)
+    update_income_statement(api, warehouse, ticks)
+    update_price_data(api, warehouse, ticks)
 
 def update_price_data(api: av.AlphaVantage, warehouse: wh.Warehouse, ticks: list[str]) -> None:
     table = 'price_data'
