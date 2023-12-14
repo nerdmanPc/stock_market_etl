@@ -1,7 +1,7 @@
 import pandas as pd
 import sqlite3 as sql3
 
-def connect(db_path):
+def sqlite_connection(db_path):
     return sql3.connect(db_path)
 class Warehouse:
     def __init__(self, db_conn) -> None:
