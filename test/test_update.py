@@ -13,7 +13,8 @@ def mock_api(test_case: TestCase) -> AlphaVantage:
     balance_sheet_response = open('test/samples/BALANCE_SHEET_IBM.json').read()
     overview_response = open('test/samples/OVERVIEW_IBM.json').read()
     def fake_request(url: str) -> str: 
-        if not 'symbol=IBM' in url: raise Exception(f'Unexpected URL: {url}')
+        if not 'symbol=IBM' in url: 
+            test_case.assertTrue(False, f'Unexpected Symbol - URL: {url}')
         if 'WEEKLY_ADJUSTED' in url:
             return price_response
         elif 'EARNINGS' in url:
@@ -27,7 +28,7 @@ def mock_api(test_case: TestCase) -> AlphaVantage:
         elif 'OVERVIEW' in url:
             return overview_response
         else:
-            raise Exception(f'Unexpected URL: {url}')
+            test_case.assertTrue(False, f'Unexpected Function - URL: {url}')
     return AlphaVantage('TEST_KEY', fake_request)
 
 class EmptyWareHouse(TestCase):
@@ -173,6 +174,67 @@ class NonEmptyWarehouse(TestCase):
         update_company_data(self.api, self.warehouse, ['IBM'])
         self.assertEqual(self.new_overview, self.warehouse.list_rows('company_data'))
 
+class UpToDateWarehouse(TestCase):
+
+    def setUp(self) -> None:
+        self.api = mock_api(self)
+
+        migration = open('migration/migrate.sql').read()
+        memory_db = sql3.connect(':memory:')
+        memory_db.executescript(migration)
+        self.warehouse = Warehouse(memory_db)
+
+        prices_response = self.api.get_weekly_adjusted('IBM')
+        self.prices = [('IBM',) + row for row in decode_price_data(prices_response)]
+        self.warehouse.extend_table('price_data', self.prices)
+
+        earnings_response = self.api.get_earnings('IBM')
+        self.earnings = [('IBM',) + row for row in decode_earnings_data(earnings_response)]
+        self.warehouse.extend_table('earnings_data', self.earnings)
+
+        cash_flow_response = self.api.get_cash_flow('IBM')
+        self.cash_flow = [('IBM',) + row for row in decode_fundamentals(cash_flow_response)]
+        self.warehouse.extend_table('cashflow_data', self.cash_flow)
+
+        income_statement_response = self.api.get_income_statement('IBM')
+        self.income_statement = [('IBM',) + row for row in decode_fundamentals(income_statement_response)]
+        self.warehouse.extend_table('income_statement', self.income_statement)
+
+        balance_sheet_response = self.api.get_balance_sheet('IBM')
+        self.balance_sheet = [('IBM',) + row for row in decode_fundamentals(balance_sheet_response)]
+        self.warehouse.extend_table('balance_sheet', self.balance_sheet)
+
+        overview_response = self.api.get_company_overview('IBM')
+        self.overview = decode_company_data(overview_response)
+        self.warehouse.update_table('company_data', self.overview)
+
+        def fake_request(url: str):
+            self.assertTrue(False, f'Redundant call with url: {url}')
+        self.api = AlphaVantage('TEST_KEY', fake_request)
+
+    def test_should_skip_update_prices(self):
+        update_price_data(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.prices, self.warehouse.list_rows('price_data'))
+
+    def test_should_skip_update_earnings(self):
+        update_earnings_data(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.earnings, self.warehouse.list_rows('earnings_data'))
+
+    def test_should_skip_update_cashflow(self):
+        update_cashflow_data(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.cash_flow, self.warehouse.list_rows('cashflow_data'))
+    
+    def test_should_skip_update_income_statement(self):
+        update_income_statement(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.income_statement, self.warehouse.list_rows('income_statement'))
+    
+    def test_should_skip_update_balance_sheet(self):
+        update_balance_sheet(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.balance_sheet, self.warehouse.list_rows('balance_sheet'))
+
+    def test_should_skip_update_companies(self):
+        update_company_data(self.api, self.warehouse, ['IBM'])
+        self.assertEqual(self.overview, self.warehouse.list_rows('company_data'))
 
 
 if __name__ == '__main__':
