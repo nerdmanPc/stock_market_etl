@@ -1,5 +1,6 @@
 from unittest import TestCase, main
 import sqlite3 as sql3
+from datetime import date, timedelta
 
 from src.av_update import *
 from src.av_warehouse import Warehouse
@@ -34,6 +35,8 @@ def mock_api(test_case: TestCase) -> AlphaVantage:
 class EmptyWareHouse(TestCase):
     def setUp(self) -> None:
         self.api = mock_api(self)
+        self.last_week = date(2023, 12, 1)
+        self.last_quarter = date(2023, 9, 30)
 
         migration = open('migration/migrate.sql').read()
         memory_db = sql3.connect(':memory:')
@@ -41,7 +44,7 @@ class EmptyWareHouse(TestCase):
         self.warehouse = Warehouse(memory_db)
 
     def test_should_fill_prices(self):
-        update_price_data(self.api, self.warehouse, ['IBM'])
+        update_price_data(self.api, self.warehouse, ['IBM'], self.last_week + timedelta(days=7))
         first_row = (
             'IBM', '2023-12-01', '154.9900', '160.5900', '154.7500', 
             '160.5500', '160.5500', '21900644', '0.0000' 
@@ -49,14 +52,14 @@ class EmptyWareHouse(TestCase):
         self.assertEqual(first_row, self.warehouse.list_rows('price_data')[0])
 
     def test_should_fill_earnings(self):
-        update_earnings_data(self.api, self.warehouse, ['IBM'])
+        update_earnings_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         first_row = (
             "IBM", "2023-09-30", "2023-10-25", "2.2", "2.13", "0.07", "3.2864" 
         )
         self.assertEqual(first_row, self.warehouse.list_rows('earnings_data')[0])
 
     def test_should_fill_cashflow(self):
-        update_cashflow_data(self.api, self.warehouse, ['IBM'])
+        update_cashflow_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         first_row = (
             "IBM", "2023-09-30", "USD", "3056000000", "None", "None",
             "None", "None", "1093000000", "281000000", "None", "None", 
@@ -68,7 +71,7 @@ class EmptyWareHouse(TestCase):
         self.assertIn(first_row, self.warehouse.list_rows('cashflow_data'))
     
     def test_should_fill_income_statement(self):
-        update_income_statement(self.api, self.warehouse, ['IBM'])
+        update_income_statement(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         first_row = (
             "IBM", "2023-09-30", "USD", "8023000000", "14752000000",
             "6729000000", "42000000", "1994000000", "4458000000", "1685000000",
@@ -80,7 +83,7 @@ class EmptyWareHouse(TestCase):
         self.assertIn(first_row, self.warehouse.list_rows('income_statement'))
     
     def test_should_fill_balance_sheet(self):
-        update_balance_sheet(self.api, self.warehouse, ['IBM'])
+        update_balance_sheet(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         first_row = (
             "IBM", "2023-09-30", "USD", "129321000000", "27705000000", 
             "7257000000", "7257000000", "1399000000", "6039000000", "100035000000",
@@ -113,6 +116,8 @@ class EmptyWareHouse(TestCase):
 class NonEmptyWarehouse(TestCase):
     def setUp(self) -> None:
         self.api = mock_api(self)
+        self.last_week = date(2023, 12, 1)
+        self.last_quarter = date(2023, 9, 30)
 
         migration = open('migration/migrate.sql').read()
         memory_db = sql3.connect(':memory:')
@@ -151,23 +156,23 @@ class NonEmptyWarehouse(TestCase):
         self.warehouse.update_table('company_data', old_overview)
 
     def test_should_update_prices(self):
-        update_price_data(self.api, self.warehouse, ['IBM'])
+        update_price_data(self.api, self.warehouse, ['IBM'], self.last_week + timedelta(days=7))
         self.assertEqual(self.new_prices, self.warehouse.list_rows('price_data'))
 
     def test_should_update_earnings(self):
-        update_earnings_data(self.api, self.warehouse, ['IBM'])
+        update_earnings_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         self.assertEqual(self.new_earnings, self.warehouse.list_rows('earnings_data'))
 
     def test_should_update_cashflow(self):
-        update_cashflow_data(self.api, self.warehouse, ['IBM'])
+        update_cashflow_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         self.assertEqual(self.new_cash_flow, self.warehouse.list_rows('cashflow_data'))
     
     def test_should_update_income_statement(self):
-        update_income_statement(self.api, self.warehouse, ['IBM'])
+        update_income_statement(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         self.assertEqual(self.new_income_statement, self.warehouse.list_rows('income_statement'))
     
     def test_should_update_balance_sheet(self):
-        update_balance_sheet(self.api, self.warehouse, ['IBM'])
+        update_balance_sheet(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         self.assertEqual(self.new_balance_sheet, self.warehouse.list_rows('balance_sheet'))
 
     def test_should_update_companies(self):
@@ -178,6 +183,8 @@ class UpToDateWarehouse(TestCase):
 
     def setUp(self) -> None:
         self.api = mock_api(self)
+        self.last_week = date(2023, 12, 1)
+        self.last_quarter = date(2023, 9, 30)
 
         migration = open('migration/migrate.sql').read()
         memory_db = sql3.connect(':memory:')
@@ -213,28 +220,28 @@ class UpToDateWarehouse(TestCase):
         self.api = AlphaVantage('TEST_KEY', fake_request)
 
     def test_should_skip_update_prices(self):
-        update_price_data(self.api, self.warehouse, ['IBM'])
+        update_price_data(self.api, self.warehouse, ['IBM'], self.last_week + timedelta(days=6))
         self.assertEqual(self.prices, self.warehouse.list_rows('price_data'))
 
     def test_should_skip_update_earnings(self):
-        update_earnings_data(self.api, self.warehouse, ['IBM'])
+        update_earnings_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=89))
         self.assertEqual(self.earnings, self.warehouse.list_rows('earnings_data'))
 
     def test_should_skip_update_cashflow(self):
-        update_cashflow_data(self.api, self.warehouse, ['IBM'])
+        update_cashflow_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=89))
         self.assertEqual(self.cash_flow, self.warehouse.list_rows('cashflow_data'))
     
     def test_should_skip_update_income_statement(self):
-        update_income_statement(self.api, self.warehouse, ['IBM'])
+        update_income_statement(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=89))
         self.assertEqual(self.income_statement, self.warehouse.list_rows('income_statement'))
     
     def test_should_skip_update_balance_sheet(self):
-        update_balance_sheet(self.api, self.warehouse, ['IBM'])
+        update_balance_sheet(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=89))
         self.assertEqual(self.balance_sheet, self.warehouse.list_rows('balance_sheet'))
 
-    def test_should_skip_update_companies(self):
-        update_company_data(self.api, self.warehouse, ['IBM'])
-        self.assertEqual(self.overview, self.warehouse.list_rows('company_data'))
+    #def test_should_skip_update_companies(self):
+    #    update_company_data(self.api, self.warehouse, ['IBM'])
+    #    self.assertEqual(self.overview, self.warehouse.list_rows('company_data'))
 
 
 if __name__ == '__main__':

@@ -1,10 +1,11 @@
 import pandas as pd
 import sqlite3 as sql3
+from datetime import date
 
 def sqlite_connection(db_path):
     return sql3.connect(db_path)
 class Warehouse:
-    def __init__(self, db_conn) -> None:
+    def __init__(self, db_conn: sql3.Connection) -> None:
         self.db_conn = db_conn
 
     def table_columns(self, table_id: str):
@@ -23,6 +24,13 @@ class Warehouse:
             key=get_primary_key
         ))
     
+    def latest_timestamp(self, table_id: str, tick: str) -> date:
+        query = f"SELECT timestamp FROM {table_id} WHERE tick = '{tick}' ORDER BY timestamp DESC LIMIT 1"
+        result = self.db_conn.execute(query).fetchall()
+        if not result:
+            return date.min
+        return date.fromisoformat(result[0][0])
+
     def insertion_query(self, table_id: str, table_width: int, if_exists: str) -> str:
         placeholders = ','.join(['?'] * table_width)
         return f'INSERT OR {if_exists} INTO {table_id} VALUES ({placeholders})'

@@ -16,13 +16,13 @@ create table if not exists price_data (
 
 create table if not exists earnings_data (
     tick,
-    fiscal_Date_Ending,
+    timestamp,--fiscal_Date_Ending,
     reported_Date,
     reported_EPS,
     estimated_EPS,
     surprise,
     surprise_Percentage,
-    primary key (tick, fiscal_Date_Ending),
+    primary key (tick, timestamp),--fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
@@ -30,7 +30,7 @@ create table if not exists earnings_data (
 
 create table if not exists cashflow_data (
     tick,
-    fiscal_Date_Ending,
+    timestamp,--fiscal_Date_Ending,
     reported_Currency,
     operating_Cashflow,
     payments_For_Operating_Activities,
@@ -59,7 +59,7 @@ create table if not exists cashflow_data (
     change_In_Cash_And_Cash_Equivalents,
     change_In_Exchange_Rate,
     net_Income,
-    primary key (tick, fiscal_Date_Ending),
+    primary key (tick, timestamp),--fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
@@ -67,7 +67,7 @@ create table if not exists cashflow_data (
 
 create table if not exists income_statement (
     tick,
-    fiscal_Date_Ending,
+    timestamp,--fiscal_Date_Ending,
     reported_Currency,
     gross_Profit,
     total_Revenue,
@@ -93,7 +93,7 @@ create table if not exists income_statement (
     ebit,
     ebitda,
     net_Income,
-    primary key (tick, fiscal_Date_Ending),
+    primary key (tick, timestamp),--fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
@@ -101,7 +101,7 @@ create table if not exists income_statement (
 
 create table if not exists balance_sheet(
     tick,
-    fiscal_Date_Ending,
+    timestamp,--fiscal_Date_Ending,
     reported_Currency,
     total_Assets,
     total_Current_Assets,
@@ -139,7 +139,7 @@ create table if not exists balance_sheet(
     retained_Earnings,
     common_Stock,
     common_Stock_Shares_Outstanding,
-    primary key (tick, fiscal_Date_Ending),
+    primary key (tick, timestamp),--fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 
         on update no action
