@@ -156,10 +156,10 @@ def get_api_key():
         return file.read()
 
 def fetch_data(url: str) -> str:
-    sleep(12)
+    #sleep(12)
     req = http.get(url)
     if req.status_code != 200:
-        raise Exception(f'Request error: {req.status_code} - {req.content}')
+        raise Exception(f'Request error {req.status_code}:\n{req.content}')
     data = str(req.content, 'utf-8')
     check_api_error(data, url)
     return data
@@ -184,17 +184,21 @@ def decode_earnings_data(data: str):
     data = json.loads(data)
     if 'quarterlyEarnings' in data:
         data = data['quarterlyEarnings']
-    else:
+    elif 'annualEarnings' in data:
         data = data['annualEarnings']
+    else:
+        raise Exception(f'Malformed earnings data:\n{data}')
     return [tuple(row.values()) for row in data]
 
 def decode_fundamentals(data: str) -> list[tuple]:
-    dbg_data = '\n'.join(data.split())
+    #dbg_data = '\n'.join(data.split())
     data = json.loads(data)
     if 'quarterlyReports' in data:
         data = data['quarterlyReports']
-    else:
+    elif 'annualReports' in data:
         data = data['annualReports']
+    else:
+        raise Exception(f'Malformed fundamental data:\n{data}')
     return [tuple(row.values()) for row in data]
 
 def decode_company_data(data: str) -> list[tuple]:
