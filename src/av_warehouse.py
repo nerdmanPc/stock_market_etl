@@ -16,12 +16,12 @@ class Warehouse:
         columns = self.table_columns(table_id)
 
         is_primary_key = lambda x: x[-1] != 0
-        get_primary_key = lambda x: x[-1]
+        get_key_position = lambda x: x[-1]
         get_name = lambda x: x[1]
         
         return map(get_name, sorted(
             filter(is_primary_key, columns), 
-            key=get_primary_key
+            key=get_key_position
         ))
     
     def latest_timestamp(self, table_id: str, tick: str) -> date:
@@ -31,23 +31,19 @@ class Warehouse:
             return date.min
         return date.fromisoformat(result[0][0])
 
-    def insertion_query(self, table_id: str, table_width: int, if_exists: str) -> str:
+    def insert_rows(self, table_id: str, data: list, table_width: int, if_exists: str):
         placeholders = ','.join(['?'] * table_width)
-        return f'INSERT OR {if_exists} INTO {table_id} VALUES ({placeholders})'
+        query = f'INSERT OR {if_exists} INTO {table_id} VALUES ({placeholders})'
+        self.db_conn.executemany(query, data)
+        self.db_conn.commit()
 
     def extend_table(self, table: str, data: list):
         columns = self.table_columns(table)
-        #dbg = { col[1]: value for col, value in zip(columns, data[0]) }
-        extend_query = self.insertion_query(table, table_width=len(columns), if_exists='IGNORE')
-        self.db_conn.executemany(extend_query, data)
-        self.db_conn.commit()
+        self.insert_rows(table, data, table_width=len(columns), if_exists='IGNORE')
 
     def update_table(self, table: str, data: list):
         columns = self.table_columns(table)
-        #dbg = { col[1]: value for col, value in zip(columns, data[0]) }
-        update_query = self.insertion_query(table, table_width=len(columns), if_exists='REPLACE')
-        self.db_conn.executemany(update_query, data)
-        self.db_conn.commit()
+        self.insert_rows(table, data, table_width=len(columns), if_exists='REPLACE')
     
     def list_keys(self, table: str) -> list:
         key_cols = self.table_primary_keys(table)
