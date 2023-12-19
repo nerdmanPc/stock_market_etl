@@ -2,6 +2,6 @@ api-key.txt
 data/
 .vscode/
 __pycache__/
-
 exploration_2.ipynb
 av_load.py
+.env

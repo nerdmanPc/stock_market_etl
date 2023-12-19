@@ -3,4 +3,3 @@ insert into company_data (tick) values
     ('AAPL'),
     ('NVDA'),
     ('IBM');
-

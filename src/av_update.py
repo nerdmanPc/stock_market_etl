@@ -1,13 +1,14 @@
 import src.av_api as av
 import src.av_warehouse as wh
 from datetime import date, timedelta
+import os
 
-WAREHOUSE_PATH = 'data/warehouse.db'
+#WAREHOUSE_PATH = 'data/warehouse.db'
 
-def run():
-    api = av.AlphaVantage()
-    warehouse = wh.Warehouse(wh.sqlite_connection(WAREHOUSE_PATH))
-    ticks = [key[0] for key in warehouse.list_keys('companies_data')]
+def run(api_key, warehouse_path):
+    api = av.AlphaVantage(api_key)
+    warehouse = wh.Warehouse(wh.sqlite_connection(warehouse_path))
+    ticks = [key[0] for key in warehouse.list_keys('company_data')]
 
     update_company_data(api, warehouse, ticks)
     update_earnings_data(api, warehouse, ticks)
@@ -94,4 +95,4 @@ def update_company_data(api: av.AlphaVantage, warehouse: wh.Warehouse, ticks: li
         warehouse.update_table(table, data)
 
 if __name__ == '__main__':
-    run()
+    run(os.environ['ALPHA_VANTAGE_KEY'], os.environ['ETL_WAREHOUSE_PATH'])
