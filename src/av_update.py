@@ -10,7 +10,6 @@ def run():
     api = av.AlphaVantage(ALPHA_VANTAGE_KEY)
     db_conn = wh.sqlite_connection(ETL_WAREHOUSE_PATH)
     warehouse = wh.Warehouse(db_conn)
-    print(ETL_WAREHOUSE_PATH)
     ticks = [key[0] for key in warehouse.list_keys('company_data')]
     shell_args = {arg for arg in sys.argv}
 
