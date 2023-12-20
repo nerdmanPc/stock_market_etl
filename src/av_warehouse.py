@@ -10,7 +10,10 @@ class Warehouse:
 
     def table_columns(self, table_id: str):
         table_info_query = f"PRAGMA table_info({table_id})"
-        return self.db_conn.execute(table_info_query).fetchall()
+        columns =  self.db_conn.execute(table_info_query).fetchall()
+        if not columns:
+            raise Exception(f'Table "{table_id}" does not exist!')
+        return columns
     
     def table_primary_keys(self, table_id: str):
         columns = self.table_columns(table_id)

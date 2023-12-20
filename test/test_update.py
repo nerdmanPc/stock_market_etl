@@ -125,27 +125,27 @@ class NonEmptyWarehouse(TestCase):
         self.warehouse = Warehouse(memory_db)
 
         prices_response = self.api.get_weekly_adjusted('IBM')
-        self.new_prices = [('IBM',) + row for row in decode_price_data(prices_response)]
+        self.new_prices = decode_price_data(prices_response, 'IBM')
         old_prices = self.new_prices[:-12]
         self.warehouse.extend_table('price_data', old_prices)
 
         earnings_response = self.api.get_earnings('IBM')
-        self.new_earnings = [('IBM',) + row for row in decode_earnings_data(earnings_response)]
+        self.new_earnings = decode_earnings_data(earnings_response, 'IBM')
         old_earnings = self.new_earnings[:-4]
         self.warehouse.extend_table('earnings_data', old_earnings)
 
         cash_flow_response = self.api.get_cash_flow('IBM')
-        self.new_cash_flow = [('IBM',) + row for row in decode_fundamentals(cash_flow_response)]
+        self.new_cash_flow = decode_fundamentals(cash_flow_response, 'IBM')
         old_cash_flow = self.new_cash_flow[:-4]
         self.warehouse.extend_table('cashflow_data', old_cash_flow)
 
         income_statement_response = self.api.get_income_statement('IBM')
-        self.new_income_statement = [('IBM',) + row for row in decode_fundamentals(income_statement_response)]
+        self.new_income_statement = decode_fundamentals(income_statement_response, 'IBM')
         old_income_statement = self.new_income_statement[:-4]
         self.warehouse.extend_table('income_statement', old_income_statement)
 
         balance_sheet_response = self.api.get_balance_sheet('IBM')
-        self.new_balance_sheet = [('IBM',) + row for row in decode_fundamentals(balance_sheet_response)]
+        self.new_balance_sheet = decode_fundamentals(balance_sheet_response, 'IBM')
         old_balance_sheet = self.new_balance_sheet[:-4]
         self.warehouse.extend_table('balance_sheet', old_balance_sheet)
 
@@ -192,23 +192,23 @@ class UpToDateWarehouse(TestCase):
         self.warehouse = Warehouse(memory_db)
 
         prices_response = self.api.get_weekly_adjusted('IBM')
-        self.prices = [('IBM',) + row for row in decode_price_data(prices_response)]
+        self.prices = decode_price_data(prices_response, 'IBM')
         self.warehouse.extend_table('price_data', self.prices)
 
         earnings_response = self.api.get_earnings('IBM')
-        self.earnings = [('IBM',) + row for row in decode_earnings_data(earnings_response)]
+        self.earnings = decode_earnings_data(earnings_response, 'IBM')
         self.warehouse.extend_table('earnings_data', self.earnings)
 
         cash_flow_response = self.api.get_cash_flow('IBM')
-        self.cash_flow = [('IBM',) + row for row in decode_fundamentals(cash_flow_response)]
+        self.cash_flow = decode_fundamentals(cash_flow_response, 'IBM')
         self.warehouse.extend_table('cashflow_data', self.cash_flow)
 
         income_statement_response = self.api.get_income_statement('IBM')
-        self.income_statement = [('IBM',) + row for row in decode_fundamentals(income_statement_response)]
+        self.income_statement = decode_fundamentals(income_statement_response, 'IBM')
         self.warehouse.extend_table('income_statement', self.income_statement)
 
         balance_sheet_response = self.api.get_balance_sheet('IBM')
-        self.balance_sheet = [('IBM',) + row for row in decode_fundamentals(balance_sheet_response)]
+        self.balance_sheet = decode_fundamentals(balance_sheet_response, 'IBM')
         self.warehouse.extend_table('balance_sheet', self.balance_sheet)
 
         overview_response = self.api.get_company_overview('IBM')

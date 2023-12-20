@@ -11,9 +11,10 @@ class PriceDataCsv(test.TestCase):
             self.assertTrue(isinstance(self.input, str))
 
     def test_sholud_convert_to_list_of_tuples(self):
-        result = api.decode_price_data(self.input)
+        result = api.decode_price_data(self.input, 'IBM')
         self.assertTrue(isinstance(result, list))
         self.assertIn( (
+            'IBM',
             '2023-11-29',
             '156.15',
             '157.51',
@@ -36,9 +37,10 @@ class EarningsDataJson(test.TestCase):
             self.input = file.read()
     
     def test_sholud_convert_to_list_of_tuples(self):
-        result = api.decode_earnings_data(self.input)
+        result = api.decode_earnings_data(self.input, 'IBM')
         self.assertTrue(isinstance(result, list))
         self.assertIn( (
+            'IBM',
             "2023-09-30",
             "2023-10-25",
             "2.2",

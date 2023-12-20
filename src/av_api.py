@@ -156,12 +156,13 @@ def get_api_key():
         return file.read()
 
 def fetch_data(url: str) -> str:
-    #sleep(12)
+    print(f'Fetching data from: {url}')
     req = http.get(url)
     if req.status_code != 200:
         raise Exception(f'Request error {req.status_code}:\n{req.content}')
     data = str(req.content, 'utf-8')
     check_api_error(data, url)
+    print('Fetching successful!')
     return data
 
 def check_api_error(data: str, url: str):
@@ -176,11 +177,11 @@ def check_api_error(data: str, url: str):
     except:
         pass
 
-def decode_price_data(data: str) -> list[tuple]:
+def decode_price_data(data: str, tick: str) -> list[tuple]:
     rows = csv.reader(data.splitlines()[1:])
-    return [tuple(row) for row in rows]
+    return [(tick,) + tuple(row) for row in rows]
 
-def decode_earnings_data(data: str):
+def decode_earnings_data(data: str, tick: str):
     data = json.loads(data)
     if 'quarterlyEarnings' in data:
         data = data['quarterlyEarnings']
@@ -188,9 +189,9 @@ def decode_earnings_data(data: str):
         data = data['annualEarnings']
     else:
         raise Exception(f'Malformed earnings data:\n{data}')
-    return [tuple(row.values()) for row in data]
+    return [(tick,) + tuple(row.values()) for row in data]
 
-def decode_fundamentals(data: str) -> list[tuple]:
+def decode_fundamentals(data: str, tick: str) -> list[tuple]:
     #dbg_data = '\n'.join(data.split())
     data = json.loads(data)
     if 'quarterlyReports' in data:
@@ -199,7 +200,7 @@ def decode_fundamentals(data: str) -> list[tuple]:
         data = data['annualReports']
     else:
         raise Exception(f'Malformed fundamental data:\n{data}')
-    return [tuple(row.values()) for row in data]
+    return [(tick,) + tuple(row.values()) for row in data]
 
 def decode_company_data(data: str) -> list[tuple]:
     data = json.loads(data)
