@@ -1,5 +1,4 @@
-delete from company_data; 
-insert into company_data (tick) values 
+insert or ignore into company_data (tick) values 
     ('IBM'),
 	('TSM'),
 	('ASML'),
