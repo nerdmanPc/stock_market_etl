@@ -2,9 +2,14 @@ from unittest import TestCase, main
 import sqlite3 as sql3
 from datetime import date, timedelta
 
-from src.av_update import *
-from src.av_warehouse import Warehouse
-from src.av_api import AlphaVantage, decode_price_data, decode_earnings_data, decode_fundamentals, decode_company_data
+'''WORKAROUND: VS Code testing extension is not setting the "PYTHONPATH" 
+environment variable according to the settings.json file'''
+import sys
+sys.path.insert(0, './src')
+
+from av_update import *
+from av_warehouse import Warehouse
+from av_api import AlphaVantage, decode_price_data, decode_earnings_data, decode_fundamentals, decode_company_data
 
 def mock_api(test_case: TestCase) -> AlphaVantage:
     price_response = open('test/samples/WEEKLY_ADJUSTED_IBM.csv').read()
