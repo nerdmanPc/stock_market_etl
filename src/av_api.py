@@ -5,6 +5,7 @@ from time import sleep
 #import pandas as pd
 import csv
 import json
+import re
 
 AV_ENDPOINT = 'https://alphavantage.co/query'
 
@@ -29,11 +30,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_intraday(self, symbol, interval_mins, output_size='full', data_type='csv') -> str:
-        query = self.intraday_query_query(symbol, interval_mins, output_size, data_type)
+    def get_intraday(self, symbol, interval_mins, output_size='full', data_type='json') -> str:
+        query = self.intraday_query(symbol, interval_mins, output_size, data_type)
         return self._fetch_data(query)
 
-    def intraday_query(self, symbol, interval_mins, output_size='full', data_type='csv') -> str:
+    def intraday_query(self, symbol, interval_mins, output_size='full', data_type='json') -> str:
         arguments = {
             'function': 'TIME_SERIES_INTRADAY',
             'apikey': self._api_key,
@@ -46,11 +47,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_daily_adjusted(self, symbol, output_size='full', data_type='csv') -> str:
+    def get_daily_adjusted(self, symbol, output_size='full', data_type='json') -> str:
         query = self.daily_adjusted_query(symbol, output_size, data_type)
         return self._fetch_data(query)
 
-    def daily_adjusted_query(self, symbol, output_size='full', data_type='csv') -> str:
+    def daily_adjusted_query(self, symbol, output_size='full', data_type='json') -> str:
         arguments = {
             'function': 'TIME_SERIES_DAILY_ADJUSTED',
             'apikey': self._api_key,
@@ -62,11 +63,11 @@ class AlphaVantage:
         arguments = assemble_arguments(**arguments)
         return f'{AV_ENDPOINT}?{arguments}'
     
-    def get_weekly_adjusted(self, symbol, data_type='csv') -> str:
+    def get_weekly_adjusted(self, symbol, data_type='json') -> str:
         query = self.weekly_adjusted_query(symbol, data_type)
         return self._fetch_data(query)
 
-    def weekly_adjusted_query(self, symbol, data_type='csv') -> str:
+    def weekly_adjusted_query(self, symbol, data_type='json') -> str:
         arguments = {
             'function': 'TIME_SERIES_WEEKLY_ADJUSTED',
             'apikey': self._api_key,
@@ -151,6 +152,10 @@ def assemble_arguments(**kw_args) -> str:
     pairs = [f'{name}={value}' for name, value in kw_args.items()]
     return '&'.join(pairs)
 
+def extract_arguments(url: str) -> dict[str, str]:
+    args = (re.split(r'[\?&]', url))[1:]
+    return { arg.split('=')[0]: arg.split('=')[1] for arg in args }
+
 def get_api_key():
     with open('api-key.txt') as file:
         return file.read()
@@ -178,8 +183,9 @@ def check_api_error(data: str, url: str):
         pass
 
 def decode_price_data(data: str, tick: str) -> list[tuple]:
-    rows = csv.reader(data.splitlines()[1:])
-    return [(tick,) + tuple(row) for row in rows]
+    #rows = csv.reader(data.splitlines()[1:])
+    data = json.loads(data)["Weekly Adjusted Time Series"]
+    return [(tick, timestamp) + tuple(row.values()) for timestamp, row in data.items()]
 
 def decode_earnings_data(data: str, tick: str):
     data = json.loads(data)

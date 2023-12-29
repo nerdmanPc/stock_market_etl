@@ -1,6 +1,7 @@
 from unittest import TestCase, main
 import sqlite3 as sql3
 from datetime import date, timedelta
+import re
 
 '''WORKAROUND: VS Code testing extension is not setting the "PYTHONPATH" 
 environment variable according to the settings.json file'''
@@ -9,32 +10,40 @@ sys.path.insert(0, './src')
 
 from av_update import *
 from av_warehouse import Warehouse
-from av_api import AlphaVantage, decode_price_data, decode_earnings_data, decode_fundamentals, decode_company_data
+from av_api import AlphaVantage, decode_price_data, decode_earnings_data, decode_fundamentals, decode_company_data, extract_arguments
 
 def mock_api(test_case: TestCase) -> AlphaVantage:
-    price_response = open('test/samples/WEEKLY_ADJUSTED_IBM.csv').read()
+
+    price_response = open('test/samples/WEEKLY_ADJUSTED_IBM.json').read()
     earnings_response = open('test/samples/EARNINGS_IBM.json').read()
     cash_flow_response = open('test/samples/CASH_FLOW_IBM.json').read()
     income_statement_response = open('test/samples/INCOME_STATEMENT_IBM.json').read()
     balance_sheet_response = open('test/samples/BALANCE_SHEET_IBM.json').read()
     overview_response = open('test/samples/OVERVIEW_IBM.json').read()
+
     def fake_request(url: str) -> str: 
-        if not 'symbol=IBM' in url: 
-            test_case.assertTrue(False, f'Unexpected Symbol - URL: {url}')
-        if 'WEEKLY_ADJUSTED' in url:
-            return price_response
-        elif 'EARNINGS' in url:
-            return earnings_response
-        elif 'CASH_FLOW' in url:
-            return cash_flow_response
-        elif 'INCOME_STATEMENT' in url:
-            return income_statement_response
-        elif 'BALANCE_SHEET' in url:
-            return balance_sheet_response
-        elif 'OVERVIEW' in url:
-            return overview_response
-        else:
-            test_case.assertTrue(False, f'Unexpected Function - URL: {url}')
+        args = extract_arguments(url)
+        tick = args['symbol']
+        api_function = args['function']
+        test_case.assertEqual(tick, 'IBM', f'Unexpected Symbol: {tick}')
+
+        match api_function:
+            case 'TIME_SERIES_WEEKLY_ADJUSTED':
+                test_case.assertEqual(args['datatype'], 'json')
+                return price_response
+            case 'EARNINGS':
+                return earnings_response
+            case 'CASH_FLOW':
+                return cash_flow_response
+            case 'INCOME_STATEMENT':
+                return income_statement_response
+            case 'BALANCE_SHEET':
+                return balance_sheet_response
+            case 'OVERVIEW':
+                return overview_response
+            case unexpected:
+                test_case.assert_(False, f'Unexpected Function: {unexpected}')
+        
     return AlphaVantage('TEST_KEY', fake_request)
 
 class EmptyWareHouse(TestCase):
@@ -51,8 +60,8 @@ class EmptyWareHouse(TestCase):
     def test_should_fill_prices(self):
         update_price_data(self.api, self.warehouse, ['IBM'], self.last_week + timedelta(days=7))
         first_row = (
-            'IBM', '2023-12-01', '154.9900', '160.5900', '154.7500', 
-            '160.5500', '160.5500', '21900644', '0.0000' 
+            'IBM', '2023-12-27', '162.2300', '163.6400', '162.0500', 
+            '163.4600', '163.4600', '4779055', '0.0000' 
         )
         self.assertEqual(first_row, self.warehouse.list_rows('price_data')[0])
 
@@ -121,7 +130,7 @@ class EmptyWareHouse(TestCase):
 class NonEmptyWarehouse(TestCase):
     def setUp(self) -> None:
         self.api = mock_api(self)
-        self.last_week = date(2023, 12, 1)
+        self.last_week = date(2023, 12, 27)
         self.last_quarter = date(2023, 9, 30)
 
         migration = open('migration/migrate.sql').read()
