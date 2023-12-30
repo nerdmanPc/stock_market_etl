@@ -52,7 +52,7 @@ class EmptyWareHouse(TestCase):
         self.last_week = date(2023, 12, 1)
         self.last_quarter = date(2023, 9, 30)
 
-        migration = open('migration/migrate.sql').read()
+        migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
         self.warehouse = Warehouse(memory_db)
@@ -133,7 +133,7 @@ class NonEmptyWarehouse(TestCase):
         self.last_week = date(2023, 12, 27)
         self.last_quarter = date(2023, 9, 30)
 
-        migration = open('migration/migrate.sql').read()
+        migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
         self.warehouse = Warehouse(memory_db)
@@ -200,7 +200,7 @@ class UpToDateWarehouse(TestCase):
         self.last_week = date(2023, 12, 1)
         self.last_quarter = date(2023, 9, 30)
 
-        migration = open('migration/migrate.sql').read()
+        migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
         self.warehouse = Warehouse(memory_db)

@@ -23,7 +23,7 @@ export ETL_WAREHOUSE_PATH='/path/to/warehouse.db'
 
 ### Setting the Warehouse up
 
-First, edit the *migration/setup_companies_list.sql* file to include the tickers of the companies you want to track, then run:
+First, edit the *migration/add_companies.sql* file to include the tickers of the companies you want to track, then run:
 
 ```bash
 python3 migration/migrate.py

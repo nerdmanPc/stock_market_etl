@@ -3,8 +3,8 @@ import os
 
 WAREHOUSE_PATH = os.environ['ETL_WAREHOUSE_PATH']
 
-migration = open('migration/migrate.sql').read()
-setup_companies_list = open('migration/setup_companies_list.sql').read()
+migration = open('migration/create_tables.sql').read()
+setup_companies_list = open('migration/add_companies.sql').read()
 
 memory_db = sql3.connect(WAREHOUSE_PATH)
 memory_db.executescript(migration)
