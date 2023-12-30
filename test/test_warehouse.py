@@ -1,14 +1,23 @@
 from unittest import TestCase, main
 import sqlite3 as sql3
 from src.av_warehouse import Warehouse
+from datetime import date
 class WarehouseSetup:
     def __init__(self) -> None:
 
         self.table = 'test_table'
         self.empty_table = 'empty_table'
 
-        self.old_data = [('AAPL', 1), ('NVDA', 2), ('IBM', 3)]
-        self.new_data = [('TSLA', 4), ('GOOG', 5), ('AMD', 6)]
+        self.old_data = [
+            ('AAPL', date(2007, 5, 1)), 
+            ('NVDA', date(2007, 5, 2)), 
+            ('IBM', date(2007, 5, 3))
+        ]
+        self.new_data = [
+            ('TSLA', date(2007, 5, 1)), 
+            ('GOOG', date(2007, 5, 1)), 
+            ('AMD', date(2007, 5, 1))
+        ]
 
         test_db = sql3.connect(':memory:')
         test_db.execute(f'CREATE TABLE {self.table} (key PRIMARY KEY, value)')
@@ -88,84 +97,6 @@ class Listkeys(TestCase):
     def tearDown(self) -> None:
         super().tearDown()
         self.setup.warehouse.close()
-'''
-class ExtendKeys(test.TestCase):
 
-    def setUp(self) -> None:
-        super().setUp()
-        self._warehouse = wh.Warehouse() 
-
-    def test_zero(self):
-        raise Exception()
-
-    def test_one(self):
-        raise Exception()
-
-    def test_many(self):
-        raise Exception()
-
-    def test_one_overlap(self):
-        raise Exception()
-
-    def test_many_overlap(self):
-        raise Exception()
-
-    def test_absent_table(self):
-        raise Exception()
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self._warehouse.close()
-
-class RemoveKeys(test.TestCase):
-
-    def setUp(self) -> None:
-        super().setUp()
-        self._warehouse = wh.Warehouse() 
-
-    def test_zero(self):
-        raise Exception()
-
-    def test_one(self):
-        raise Exception()
-
-    def test_many(self):
-        raise Exception()
-
-    def test_one_absent(self):
-        raise Exception()
-
-    def test_many_absent(self):
-        raise Exception()
-
-    def test_absent_table(self):
-        raise Exception()
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self._warehouse.close()
-
-class ClearTable(test.TestCase):
-
-    def setUp(self) -> None:
-        super().setUp()
-        self._warehouse = wh.Warehouse() 
-
-    def test_empty(self):
-        raise Exception()
-
-    def test_one(self):
-        raise Exception()
-
-    def test_many(self):
-        raise Exception()
-
-    def test_absent_table(self):
-        raise Exception()
-
-    def tearDown(self) -> None:
-        super().tearDown()
-        self._warehouse.close()
-'''
 if __name__ == '__main__':
     main()

@@ -1,11 +1,8 @@
 
 import requests as http
 from time import sleep
-#from io import StringIO
-#import pandas as pd
-import csv
 import json
-import re
+from datetime import date
 
 AV_ENDPOINT = 'https://alphavantage.co/query'
 
@@ -153,8 +150,11 @@ def assemble_arguments(**kw_args) -> str:
     return '&'.join(pairs)
 
 def extract_arguments(url: str) -> dict[str, str]:
-    args = (re.split(r'[\?&]', url))[1:]
-    return { arg.split('=')[0]: arg.split('=')[1] for arg in args }
+    [endpoint, args] = url.split('?')
+    args = { arg.split('=')[0]: arg.split('=')[1] for arg in args.split('&') }
+    args['ENDPOINT'] = endpoint
+    return args
+
 
 def get_api_key():
     with open('api-key.txt') as file:
@@ -183,9 +183,8 @@ def check_api_error(data: str, url: str):
         pass
 
 def decode_price_data(data: str, tick: str) -> list[tuple]:
-    #rows = csv.reader(data.splitlines()[1:])
     data = json.loads(data)["Weekly Adjusted Time Series"]
-    return [(tick, timestamp) + tuple(row.values()) for timestamp, row in data.items()]
+    return [decode_row((tick, timestamp, *row.values())) for timestamp, row in data.items()]
 
 def decode_earnings_data(data: str, tick: str):
     data = json.loads(data)
@@ -195,7 +194,7 @@ def decode_earnings_data(data: str, tick: str):
         data = data['annualEarnings']
     else:
         raise Exception(f'Malformed earnings data:\n{data}')
-    return [(tick,) + tuple(row.values()) for row in data]
+    return [decode_row((tick, *row.values())) for row in data]
 
 def decode_fundamentals(data: str, tick: str) -> list[tuple]:
     #dbg_data = '\n'.join(data.split())
@@ -206,8 +205,25 @@ def decode_fundamentals(data: str, tick: str) -> list[tuple]:
         data = data['annualReports']
     else:
         raise Exception(f'Malformed fundamental data:\n{data}')
-    return [(tick,) + tuple(row.values()) for row in data]
+    return [decode_row((tick, *row.values())) for row in data]
 
 def decode_company_data(data: str) -> list[tuple]:
     data = json.loads(data)
-    return [tuple(data.values())]
+    return [decode_row(data.values())]
+
+def decode_row(row: list[str]) -> tuple:
+    if not row:
+        return ()
+    head, *tail = row
+    if head == 'None':
+        return (None, *decode_row(tail))
+    try: 
+        return (int(head), *decode_row(tail))
+    except: pass
+    try: 
+        return (float(head), *decode_row(tail))
+    except: pass
+    try: 
+        return (date.fromisoformat(head), *decode_row(tail))
+    except: pass
+    return (head, *decode_row(tail))
