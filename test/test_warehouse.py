@@ -1,6 +1,6 @@
 from unittest import TestCase, main
 import sqlite3 as sql3
-from src.av_warehouse import Warehouse
+from av_warehouse import Warehouse
 from datetime import date
 class WarehouseSetup:
     def __init__(self) -> None:
