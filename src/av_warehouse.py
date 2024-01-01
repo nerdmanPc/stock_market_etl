@@ -15,11 +15,11 @@ def decode_cell(cell: str) -> str|date:
 def decode_row(row: sql3.Row) -> tuple:
     return tuple(map(decode_cell, row))
 
-def sqlite_connection(db_path):
-    return sql3.connect(db_path)
+def connect_sqlite(db_url):
+    return sql3.connect(db_url)
 class Warehouse:
-    def __init__(self, db_conn: sql3.Connection) -> None:
-        self.db_conn = db_conn
+    def __init__(self, db_url: str='', db_conn: sql3.Connection=None) -> None:
+        self.db_conn = db_conn or sql3.connect(db_url)
 
     def table_columns(self, table_id: str):
         table_info_query = f"PRAGMA table_info({table_id})"

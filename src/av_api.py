@@ -171,16 +171,16 @@ def fetch_data(url: str) -> str:
     return data
 
 def check_api_error(data: str, url: str):
+    err_msg = None
     try: # Happy path is when there is no 'Error Message'
         err_msg = json.loads(data)['Error Message']
-        raise Exception(f'API error!\nMessage: {err_msg}\nURL: {url}')
-    except:
-        pass
+    except: pass
     try:
-        info_msg = json.loads(data)['Information']
-        raise Exception(f'API error!\nMessage: {info_msg}\nURL: {url}')
-    except:
-        pass
+        err_msg = json.loads(data)['Information']
+    except: pass
+    if err_msg: 
+        raise Exception(f'API error!\nMessage: {err_msg}\nURL: {url}')
+
 
 def decode_price_data(data: str, tick: str) -> list[tuple]:
     data = json.loads(data)["Weekly Adjusted Time Series"]

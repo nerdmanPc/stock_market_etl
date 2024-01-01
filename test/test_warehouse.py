@@ -26,7 +26,7 @@ class WarehouseSetup:
         test_db.executemany(f'INSERT INTO {self.table} VALUES (?, ?)', self.old_data)
         test_db.commit()
 
-        self.warehouse = self.warehouse = Warehouse(test_db)
+        self.warehouse = self.warehouse = Warehouse(db_conn=test_db)
 
 class ExtendTable(TestCase):
 

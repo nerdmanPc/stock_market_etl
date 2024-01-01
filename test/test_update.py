@@ -55,7 +55,7 @@ class EmptyWareHouse(TestCase):
         migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
-        self.warehouse = Warehouse(memory_db)
+        self.warehouse = Warehouse(db_conn=memory_db)
 
     def test_should_fill_prices(self):
         update_price_data(self.api, self.warehouse, ['IBM'], self.last_week + timedelta(days=7))
@@ -136,7 +136,7 @@ class NonEmptyWarehouse(TestCase):
         migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
-        self.warehouse = Warehouse(memory_db)
+        self.warehouse = Warehouse(db_conn=memory_db)
 
         prices_response = self.api.get_weekly_adjusted('IBM')
         self.new_prices = decode_price_data(prices_response, 'IBM')
@@ -203,7 +203,7 @@ class UpToDateWarehouse(TestCase):
         migration = open('migration/create_tables.sql').read()
         memory_db = sql3.connect(':memory:')
         memory_db.executescript(migration)
-        self.warehouse = Warehouse(memory_db)
+        self.warehouse = Warehouse(db_conn=memory_db)
 
         prices_response = self.api.get_weekly_adjusted('IBM')
         self.prices = decode_price_data(prices_response, 'IBM')

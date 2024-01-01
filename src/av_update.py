@@ -6,12 +6,11 @@ import os, sys
 ALPHA_VANTAGE_KEY = os.environ['ALPHA_VANTAGE_KEY']
 ETL_WAREHOUSE_PATH = os.environ['ETL_WAREHOUSE_PATH']
 
-def run():
-    api = av.AlphaVantage(ALPHA_VANTAGE_KEY)
-    db_conn = wh.sqlite_connection(ETL_WAREHOUSE_PATH)
-    warehouse = wh.Warehouse(db_conn)
+def run(api_key = ALPHA_VANTAGE_KEY, warehouse_path = ETL_WAREHOUSE_PATH, *args):
+    api = av.AlphaVantage(api_key)
+    warehouse = wh.Warehouse(db_url=warehouse_path)
     ticks = [key[0] for key in warehouse.list_keys('company_data')]
-    shell_args = {arg for arg in sys.argv}
+    shell_args = args or {arg for arg in sys.argv}
 
     if '--update-overview' in shell_args: 
         update_company_data(api, warehouse, ticks)
