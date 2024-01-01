@@ -13,13 +13,14 @@ def run():
     ticks = [key[0] for key in warehouse.list_keys('company_data')]
     shell_args = {arg for arg in sys.argv}
 
-    if not '--skip_overview' in shell_args: 
+    if '--update-overview' in shell_args: 
         update_company_data(api, warehouse, ticks)
+    if '--update-prices'in shell_args:
+        update_price_data(api, warehouse, ticks)
     update_earnings_data(api, warehouse, ticks)
     update_income_statement(api, warehouse, ticks)
     update_cashflow_data(api, warehouse, ticks)
     update_balance_sheet(api, warehouse, ticks)
-    update_price_data(api, warehouse, ticks)
 
 def update_price_data(api: av.AlphaVantage, warehouse: wh.Warehouse, ticks: list[str], limit_date: date = None) -> None:
     table = 'price_data'
