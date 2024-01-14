@@ -14,7 +14,7 @@ def run(api_key = ALPHA_VANTAGE_KEY, warehouse_path = ETL_WAREHOUSE_PATH, *args)
 
     if '--update-overview' in shell_args: 
         update_company_data(api, warehouse, ticks)
-    if '--update-prices'in shell_args:
+    if '--update-prices' in shell_args:
         update_price_data(api, warehouse, ticks)
     update_earnings_data(api, warehouse, ticks)
     update_income_statement(api, warehouse, ticks)

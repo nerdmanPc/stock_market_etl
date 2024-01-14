@@ -197,7 +197,6 @@ def decode_earnings_data(data: str, tick: str):
     return [decode_row((tick, *row.values())) for row in data]
 
 def decode_fundamentals(data: str, tick: str) -> list[tuple]:
-    #dbg_data = '\n'.join(data.split())
     data = json.loads(data)
     if 'quarterlyReports' in data:
         data = data['quarterlyReports']
