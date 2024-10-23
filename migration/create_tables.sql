@@ -22,6 +22,7 @@ create table if not exists earnings_data (
     estimated_EPS numeric,
     surprise numeric,
     surprise_Percentage numeric,
+    report_Time text,
     primary key (tick, timestamp),--fiscal_Date_Ending),
     foreign key (tick) references company_data (tick)
         on delete cascade 

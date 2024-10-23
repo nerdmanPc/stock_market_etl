@@ -68,9 +68,9 @@ class EmptyWareHouse(TestCase):
     def test_should_fill_earnings(self):
         update_earnings_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
         first_row = (
-            "IBM", date(2023,9,30), date(2023,10,25), 2.2, 2.13, 0.07, 3.2864 
+            "IBM", date(2023,9,30), date(2023,10,25), 2.2, 2.13, 0.07, 3.2864, 'post-market'
         )
-        self.assertEqual(first_row, self.warehouse.list_rows('earnings_data')[0])
+        self.assertIn(first_row, self.warehouse.list_rows('earnings_data'))
 
     def test_should_fill_cashflow(self):
         update_cashflow_data(self.api, self.warehouse, ['IBM'], self.last_quarter + timedelta(days=90))
