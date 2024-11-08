@@ -2,6 +2,7 @@
 
 - Python 3
 - Sqlite 3
+- Requests
 
 ### API Key
 
