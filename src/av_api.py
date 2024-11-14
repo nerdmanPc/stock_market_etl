@@ -3,9 +3,10 @@ import requests as http
 from time import sleep
 import json
 from datetime import date
+import re
 
 AV_ENDPOINT = 'https://alphavantage.co/query'
-
+API_KEY_PATTERN = re.compile(r'apikey=[A-Z0-9]*&')
 class AlphaVantage:
 
     def __init__(self, api_key=None, request_callback=None) -> None:
@@ -161,7 +162,7 @@ def get_api_key():
         return file.read()
 
 def fetch_data(url: str) -> str:
-    print(f'Fetching data from: {url}')
+    print(f'Fetching data from: {re.sub(pattern=API_KEY_PATTERN, string=url, repl="apikey=******&")}')
     req = http.get(url)
     if req.status_code != 200:
         raise Exception(f'Request error {req.status_code}:\n{req.content}')
@@ -179,7 +180,7 @@ def check_api_error(data: str, url: str):
         err_msg = json.loads(data)['Information']
     except: pass
     if err_msg: 
-        raise Exception(f'API error!\nMessage: {err_msg}\nURL: {url}')
+        raise Exception(f'API error!\nMessage: {err_msg}\nURL: {re.sub(pattern=API_KEY_PATTERN, string=url, repl="apikey=******&")}')
 
 
 def decode_price_data(data: str, tick: str) -> list[tuple]:

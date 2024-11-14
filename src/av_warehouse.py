@@ -16,6 +16,7 @@ def decode_row(row: sql3.Row) -> tuple:
 
 def connect_sqlite(db_url):
     return sql3.connect(db_url)
+
 class Warehouse:
     def __init__(self, db_url: str='', db_conn: sql3.Connection=None) -> None:
         self.db_conn = db_conn or sql3.connect(db_url)
