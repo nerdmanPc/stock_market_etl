@@ -162,13 +162,13 @@ def get_api_key():
         return file.read()
 
 def fetch_data(url: str) -> str:
-    print(f'Fetching data from: {re.sub(pattern=API_KEY_PATTERN, string=url, repl="apikey=******&")}')
+    #print(f'Fetching data from: {re.sub(pattern=API_KEY_PATTERN, string=url, repl="apikey=******&")}')
     req = http.get(url)
     if req.status_code != 200:
         raise Exception(f'Request error {req.status_code}:\n{req.content}')
     data = str(req.content, 'utf-8')
     check_api_error(data, url)
-    print('Fetching successful!')
+    #print('Fetching successful!')
     return data
 
 def check_api_error(data: str, url: str):
