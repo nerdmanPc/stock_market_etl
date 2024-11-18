@@ -12,14 +12,17 @@ def run(api_key = ALPHA_VANTAGE_KEY, warehouse_path = ETL_WAREHOUSE_PATH, *args)
     ticks = [key[0] for key in warehouse.list_keys('company_data')]
     shell_args = args or {arg for arg in sys.argv}
 
-    if '--update-overview' in shell_args: 
-        update_company_data(api, warehouse, ticks)
-    if '--update-prices' in shell_args:
-        update_price_data(api, warehouse, ticks)
-    update_earnings_data(api, warehouse, ticks)
-    update_income_statement(api, warehouse, ticks)
-    update_cashflow_data(api, warehouse, ticks)
-    update_balance_sheet(api, warehouse, ticks)
+    try:
+        if '--update-overview' in shell_args: 
+            update_company_data(api, warehouse, ticks)
+        if '--update-prices' in shell_args:
+            update_price_data(api, warehouse, ticks)
+        update_earnings_data(api, warehouse, ticks)
+        update_income_statement(api, warehouse, ticks)
+        update_cashflow_data(api, warehouse, ticks)
+        update_balance_sheet(api, warehouse, ticks)
+    except Exception as ex:
+        print(ex.args[0])
 
 def update_price_data(api: av.AlphaVantage, warehouse: wh.Warehouse, ticks: list[str], limit_date: date = None) -> None:
     table = 'price_data'

@@ -1,0 +1,4 @@
+etl:
+  build: .
+  volumes:
+    - ./data:/usr/app/data
